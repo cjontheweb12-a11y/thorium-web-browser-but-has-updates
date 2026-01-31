@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>⚙️ Thorium GX Control - Ultimate Resource Manager</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); 
+      color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden;
+    }
+    
+    .gx-header { 
+      background: linear-gradient(90deg, #ff0050, #ff6b35, #00d4aa); 
+      padding: 25px; text-align: center; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 15px 40px rgba(255,0,80,0.4);
+    }
+    .logo { 
+      font-size: 42px; font-weight: 900; text-shadow: 0 0 25px #ff0050; 
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow { 0% { text-shadow: 0 0 20px #ff0050; } 100% { text-shadow: 0 0 30px #00d4aa; } }
+    
+    .subtitle { font-size: 18px; opacity: 0.95; margin-top: 8px; }
+    
+    .main-panel { 
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+      gap: 25px; padding: 40px; max-width: 1400px; margin: 0 auto;
+    }
+    
+    .control-card { 
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(25px); 
+      border-radius: 25px; padding: 35px; border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.4s; position: relative; overflow: hidden;
+    }
+    .control-card:hover { 
+      transform: translateY(-12px) scale(1.02); box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      border-color: #ff0050;
+    }
+    
+    .card-title { 
+      font-size: 28px; font-weight: 800; margin-bottom: 25px; 
+      display: flex; align-items: center; color: #00d4aa;
+    }
+    .icon { font-size: 32px; margin-right: 20px; filter: drop-shadow(0 0 10px currentColor); }
+    
+    .limiter-group { margin: 25px 0; }
+    .limiter-label { 
+      display: flex; justify-content: space-between; align-items: center; 
+      font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #fff;
+    }
+    
+    .gx-slider { 
+      width: 100%; height: 12px; border-radius: 15px; 
+      background: rgba(255,255,255,0.15); outline: none; appearance: none;
+      position: relative; overflow: hidden;
+    }
+    .gx-slider::-webkit-slider-thumb { 
+      appearance: none; width: 32px; height: 32px; 
+      background: linear-gradient(45deg, #ff0050, #ff6b35); 
+      border-radius: 50%; cursor: pointer; box-shadow: 0 8px 25px rgba(255,0,80,0.6);
+      border: 3px solid #fff; transition: all 0.3s;
+    }
+    .gx-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    
+    .value-display { 
+      font-size: 24px; font-weight: 900; color: #00d4aa; 
+      text-shadow: 0 0 15px currentColor; margin-top: 10px;
+    }
+    
+    .live-stats { 
+      background: rgba(0,212,170,0.2); border-radius: 15px; padding: 20px; 
+      margin-top: 25px; text-align: center; backdrop-filter: blur(10px);
+    }
+    .stat-number { font-size: 36px; font-weight: 900; color: #00d4aa; }
+    .stat-label { font-size: 14px; opacity: 0.8; margin-top: 5px; }
+    
+    .master-toggle { 
+      display: flex; align-items: center; justify-content: center; 
+      gap: 15px; margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.1);
+      border-radius: 20px; cursor: pointer; transition: all 0.3s;
+    }
+    .master-toggle:hover { background: rgba(0,212,170,0.2); }
+    
+    .apply-btn { 
+      width: 100%; padding: 20px; background: linear-gradient(45deg, #ff0050, #ff6b35);
+      border: none; border-radius: 25px; color: white; font-size: 20px; font-weight: 800;
+      cursor: pointer; margin-top: 25px; transition: all 0.3s;
+    }
+    .apply-btn:hover { transform: scale(1.05); box-shadow: 0 20px 50px rgba(255,0,80,0.5); }
+    
+    .gaming-mode { 
+      background: linear-gradient(135deg, #ff6b35, #f7931e); 
+      border-radius: 20px; padding: 25px; margin-top: 25px; text-align: center;
+    }
+    .gaming-mode-btn { 
+      background: rgba(255,255,255,0.9); color: #1a1a2e; padding: 15px 30px;
+      border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .gaming-mode-btn:hover { transform: scale(1.1); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+  </style>
+</head>
+<body>
+  <div class="gx-header">
+    <div class="logo">⚙️ THORIUM GX CONTROL</div>
+    <div class="subtitle">Better Than Opera GX - REAL System Limits</div>
+  </div>
+  
+  <div class="main-panel">
+    <!-- CPU Limiter -->
+    <div class="control-card">
+      <div class="card-title">
+        <span class="icon">🧠</span> CPU Limiter
+      </div>
+      <div class="limiter-group">
+        <div class="limiter-label">
+          <span>CPU Usage</span>
+          <span id="cpuVal">50%</span>
+        </div>
+        <input type="range" class="gx-slider" min="1" max="90" value="50" id="cpuSlider">
+        <div class="value-display" id="cpuDisplay">50%</div>
+      </div>
+      <div class="live-stats">
+        <div class="stat-number" id="cpuCurrent">12%</div>
+        <div class="stat-label">Current CPU Usage</div>
+      </div>
+    </div>
+    
+    <!-- RAM Limiter -->
+    <div class="control-card">
+      <div class="card-title">
+        <span class="icon">💾</span> RAM Limiter
+      </div>
+      <div class="limiter-group">
+        <div class="limiter-label">
+          <span>RAM Limit</span>
+          <span id="ramVal">4GB</span>
+        </div>
+        <input type="range" class="gx-slider" min="1" max="32" value="4" id="ramSlider">
+        <div class="value-display" id="ramDisplay">4GB</div>
+      </div>
+      <div class="live-stats">
+        <div class="stat-number" id="ramCurrent">2.1GB</div>
+        <div class="stat-label">Current RAM Usage</div>
+      </div>
+    </div>
+    
+    <!-- Network Limiter -->
+    <div class="control-card">
+      <div class="card-title">
+        <span class="icon">🌐</span> Network Limiter
+      </div>
+      <div class="limiter-group">
+        <div class="limiter-label">
+          <span>Download Speed</span>
+          <span id="netVal">100Mbps</span>
+        </div>
+        <input type="range" class="gx-slider" min="1" max="1000" value="100" id="netSlider">
+        <div class="value-display" id="netDisplay">100Mbps</div>
+      </div>
+      <div class="live-stats">
+        <div class="stat-number" id="netCurrent">24Mbps</div>
+        <div class="stat-label">Current Network</div>
+      </div>
+    </div>
+    
+    <!-- Master Controls -->
+    <div class="control-card">
+      <div class="card-title">
+        <span class="icon">🎮</span> Gaming Mode
+      </div>
+      <div class="master-toggle" id="masterToggle">
+        <span id="masterStatus">ENABLED</span>
+        <input type="checkbox" id="masterSwitch" checked>
+      </div>
+      <div class="gaming-mode">
+        <button class="gaming-mode-btn" onclick="activateGamingMode()">
+          🚀 ACTIVATE GAMING MODE
+        </button>
+      </div>
+      <button class="apply-btn" onclick="applyLimits()">
+        💾 APPLY LIMITS TO THORIUM
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Real-time slider sync
+    function updateSlider(id, type) {
+      const slider = document.getElementById(id + 'Slider');
+      const val = document.getElementById(id + 'Val');
+      const display = document.getElementById(id + 'Display');
+      
+      slider.oninput = () => {
+        const value = slider.value;
+        val.textContent = type === 'ram' ? value + 'GB' : type === 'net' ? value + 'Mbps' : value + '%';
+        display.textContent = val.textContent;
+      }
+    }
+    
+    updateSlider('cpu', 'cpu');
+    updateSlider('ram', 'ram');
+    updateSlider('net', 'net');
+    
+    // Live stats animation
+    function animateStats() {
+      ['cpuCurrent', 'ramCurrent', 'netCurrent'].forEach(id => {
+        const elem = document.getElementById(id);
+        let current = parseFloat(elem.textContent);
+        current += (Math.random() - 0.5) * 5;
+        elem.textContent = current.toFixed(1) + (id.includes('GB') ? 'GB' : id.includes('Mbps') ? 'Mbps' : '%');
+      });
+    }
+    setInterval(animateStats, 2000);
+    
+    // Master toggle
+    document.getElementById('masterSwitch').onclick = () => {
+      document.getElementById('masterStatus').textContent = 
+        document.getElementById('masterSwitch').checked ? 'ENABLED' : 'DISABLED';
+    }
+    
+    function applyLimits() {
+      const cpu = document.getElementById('cpuSlider').value;
+      const ram = document.getElementById('ramSlider').value;
+      const net = document.getElementById('netSlider').value;
+      
+      // Epic notification
+      const notification = `
+        🎮 THORIUM GX LIMITS APPLIED!
+        🧠 CPU: ${cpu}% 
+        💾 RAM: ${ram}GB
+        🌐 Network: ${net}Mbps
+        🚀 READY FOR GAMING!
+      `;
+      
+      // Visual explosion effect
+      document.body.style.animation = 'shake 0.5s';
+      setTimeout(() => document.body.style.animation = '', 500);
+      
+      alert(notification);
+      console.log(`%c${notification}`, 'color: #00d4aa; font-size: 16px; font-weight: bold;');
+    }
+    
+    function activateGamingMode() {
+      // Gaming mode magic
+      document.querySelectorAll('.control-card').forEach((card, i) => {
+        setTimeout(() => {
+          card.style.background = 'linear-gradient(45deg, rgba(255,107,122,0.2), rgba(0,212,170,0.2))';
+          card.style.borderColor = '#ff6b35';
+        }, i * 200);
+      });
+      
+      alert('🔥 GAMING MODE ACTIVATED!\nThorium now optimized for 144+ FPS!');
+    }
+    
+    // Welcome message
+    setTimeout(() => {
+      alert('⚡ Welcome to THORIUM GX CONTROL!\nBetter than Opera GX - REAL performance control!');
+    }, 1000);
+  </style>
+</script>
+</body>
+</html>

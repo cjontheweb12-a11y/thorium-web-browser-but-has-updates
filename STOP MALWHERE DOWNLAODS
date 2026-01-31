@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { 
+      margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif; 
+      background: linear-gradient(135deg, #19172b 0%, #2a263d 100%); 
+      color: white; min-height: 100vh;
+    }
+    .header { display: flex; align-items: center; margin-bottom: 25px; }
+    .logo { 
+      width: 50px; height: 50px; background: linear-gradient(45deg, #ff6b7a, #ff8e8e); 
+      border-radius: 12px; margin-right: 20px; display: flex; align-items: center; justify-content: center; 
+      font-size: 24px;
+    }
+    .title { font-size: 24px; font-weight: 700; }
+    .status { 
+      padding: 15px 20px; background: linear-gradient(90deg, #00d4aa, #00e6b3); 
+      border-radius: 15px; margin: 15px 0; display: flex; justify-content: space-between; 
+      align-items: center; box-shadow: 0 8px 25px rgba(0,212,170,0.3);
+    }
+    .status.off { background: linear-gradient(90deg, #ff4757, #ff6b7a); box-shadow: 0 8px 25px rgba(255,71,87,0.3); }
+    .shield { font-size: 28px; }
+    .stats { font-size: 14px; opacity: 0.9; }
+    button { 
+      width: 100%; padding: 15px; background: linear-gradient(45deg, #ff6b7a, #ff8e8e); 
+      border: none; border-radius: 12px; color: white; font-weight: 600; font-size: 16px; 
+      cursor: pointer; margin: 10px 0; transition: all 0.3s; border: 2px solid transparent;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(255,107,122,0.4); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .log { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; height: 300px; overflow-y: auto; font-family: monospace; }
+    .threats { color: #ff6b7a; font-weight: 600; }
+    .warning { 
+      position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(90deg, #ff4757, #ff6b7a); 
+      color: white; padding: 20px; z-index: 9999; text-align: center; display: none;
+    }
+    .continue-btn { background: rgba(255,255,255,0.3); margin-top: 15px; padding: 12px 24px; border-radius: 25px; }
+    progress { width: 100%; height: 8px; border-radius: 10px; margin: 15px 0; }
+  </style>
+</head>
+<body>
+  <div class="warning" id="warning">
+    <h2>⚠️ GX Antivirus Alert</h2>
+    <p>Potential malware/phishing detected on this page!</p>
+    <button class="continue-btn" onclick="continueAnyway()">Continue Anyway</button>
+  </div>
+  
+  <div class="header">
+    <div class="logo">🛡️</div>
+    <div class="title">GX Antivirus Protection</div>
+  </div>
+  
+  <div class="status on" id="status">
+    <span class="shield">🛡️ Protected</span>
+    <span class="stats" id="stats">0 threats today</span>
+  </div>
+  
+  <button id="scanBtn">🔍 Quick Scan</button>
+  <progress id="progress" style="display:none"></progress>
+  <button id="quarantineBtn" disabled>🗑️ Quarantine (0)</button>
+  
+  <div class="log" id="log">Status: Ready for protection...</div>
+
+  <script>
+    class GXAntivirus {
+      constructor() {
+        this.enabled = true;
+        this.threats = 0;
+        this.isScanning = false;
+        this.malwareDomains = ['malware.com', 'phish.ru', 'fakebank.net'];
+        this.init();
+      }
+      
+      init() {
+        this.bindEvents();
+        this.checkCurrentPage();
+        this.simulateRealTime();
+      }
+      
+      bindEvents() {
+        document.getElementById('scanBtn').onclick = () => this.quickScan();
+        document.getElementById('quarantineBtn').onclick = () => this.quarantine();
+      }
+      
+      checkCurrentPage() {
+        const hostname = window.location.hostname;
+        if (this.malwareDomains.some(domain => hostname.includes(domain))) {
+          document.getElementById('warning').style.display = 'block';
+          this.log('🚨 MALWARE SITE DETECTED - Page blocked!');
+        }
+      }
+      
+      quickScan() {
+        if (this.isScanning) return;
+        
+        this.isScanning = true;
+        const scanBtn = document.getElementById('scanBtn');
+        const progress = document.getElementById('progress');
+        const log = document.getElementById('log');
+        
+        scanBtn.disabled = true;
+        scanBtn.textContent = 'Scanning...';
+        progress.style.display = 'block';
+        progress.indeterminate = true;
+        
+        // Simulate file scanning
+        let scanned = 0;
+        const files = ['system32.dll', 'update.exe', 'chrome.exe', 'malware.exe', 'doc.pdf'];
+        const interval = setInterval(() => {
+          if (scanned >= files.length) {
+            clearInterval(interval);
+            this.scanComplete();
+            return;
+          }
+          
+          const file = files[scanned];
+          this.log(`Scanning: ${file}`);
+          
+          // 20% chance of finding threat
+          if (Math.random() < 0.2 && file.includes('malware')) {
+            this.threats++;
+            this.log(`❌ THREAT: ${file} (Trojan)`, 'threats');
+          }
+          
+          scanned++;
+        }, 300);
+      }
+      
+      scanComplete() {
+        this.isScanning = false;
+        document.getElementById('scanBtn').disabled = false;
+        document.getElementById('scanBtn').textContent = '🔍 Quick Scan';
+        document.getElementById('progress').style.display = 'none';
+        document.getElementById('quarantineBtn').disabled = this.threats === 0;
+        document.getElementById('quarantineBtn').textContent = `🗑️ Quarantine (${this.threats})`;
+        
+        if (this.threats > 0) {
+          this.log(`❌ Scan complete: ${this.threats} threats found!`);
+          document.getElementById('status').className = 'status off';
+          document.querySelector('#status span').textContent = '⚠️ Threats Found';
+        } else {
+          this.log('✅ Scan complete: System clean!');
+        }
+      }
+      
+      quarantine() {
+        this.threats = 0;
+        document.getElementById('quarantineBtn').disabled = true;
+        document.getElementById('quarantineBtn').textContent = '🗑️ Quarantine (0)';
+        document.getElementById('status').className = 'status on';
+        document.querySelector('#status span').textContent = '🛡️ Protected';
+        this.log('🗑️ All threats QUARANTINED successfully!');
+      }
+      
+      log(msg, className = '') {
+        const log = document.getElementById('log');
+        const time = new Date().toLocaleTimeString();
+        log.innerHTML += `<div class="${className}">[${time}] ${msg}</div>`;
+        log.scrollTop = log.scrollHeight;
+      }
+      
+      simulateRealTime() {
+        setInterval(() => {
+          if (Math.random() < 0.1) {
+            this.log('🔄 Real-time protection: Ad network blocked');
+          }
+        }, 10000);
+      }
+    }
+    
+    function continueAnyway() {
+      document.getElementById('warning').style.display = 'none';
+    }
+    
+    // Initialize GX Antivirus
+    const gx = new GXAntivirus();
+  </script>
+</body>
+</html>
